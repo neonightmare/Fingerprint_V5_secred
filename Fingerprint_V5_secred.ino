@@ -1,14 +1,12 @@
 //Testcode Fingerprintreader// neonightmare 4.2.2015
 
-// Keypad f√ºr die Speicherung neuer Finger
-// Lesevorgang durch Button
+// Keypad furr die Speicherung neuer Finger
+// Lesevorgang durch Aktivierung Klappe zum Reader
+// Keypad-Code für Erfassung&Loeschung neuer Fingerprints 0-99
 /*
- * Displays text sent over the serial port (e.g. from the Serial Monitor) on
- * an attached LCD.
- * DFRobot.com
  *Compatible with the Arduino IDE 1.0
  *Library version:1.1
- *Tested now under gitHub & Atom to edid
+ *Tested now under gitHub & Atom to Edit and compare Code
  */
 
 

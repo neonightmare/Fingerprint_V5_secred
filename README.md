@@ -1,2 +1,2 @@
 # Fingerprint_V5_secred
-Fingerprint reader, keypad with LCD for Door&amp;Garage
+Fingerprint Reader, Keypad 3x4 with LCD-Disply for Door and Garage Opener
