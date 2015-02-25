@@ -28,8 +28,7 @@ SoftwareSerial mySerial(2, 3);
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
 
 int CoverOpen    = 11;  // beim oeffnen des Deckels -> Aktivierung Fingerprint
-int KeyLock      = A0;   // entspridcht PIN14 / A0 -> 10kOhm-Ground n√∂tig !!Schl√ºsselschalter f√ºr Programmierung http://forum.arduino.cc/index.php?topic=28720.0
-int garageButton  = A1; // entspricht PIN 15 / A1
+int garageButton = A0; //  entspridcht PIN14 / A0
 
 int door         = 12;  // T√ºr√∂ffnerkontakt Haust√ºre
 int garage       = 13;  // Garagent√ºr√∂ffner
@@ -37,7 +36,7 @@ int garage       = 13;  // Garagent√ºr√∂ffner
 int State        = 0;  // Statusvariable 0= normal, 1= Finger scannen und pr√ºfen
 char key;
 
-int CoverOpen_read       = HIGH;
+int CoverOpen_read       = LOW;
 int KeyLock_read         = HIGH;
 int garageButton_read    = HIGH;
 int setgarageButton      = 0;
@@ -59,9 +58,6 @@ char keys[ROWS][COLS] = {
 
 byte rowPins[ROWS] = {  4, 5, 6, 7}; //connect to the row pinouts of the keypad
 byte colPins[COLS] = {  8, 9, 10  }; //connect to the column pinouts of the keypad
-//Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
-
-
 
 const byte secret_code_length = 4;
 const char secret_code[] = "1234";
@@ -86,13 +82,12 @@ unsigned long      waitTime     = 5000; // 5s
 
 unsigned long      lastTime2     = 0;
 unsigned long      elapsedTime2  = 0;
-unsigned long      waitTime2     = 4000; // 4s
+unsigned long      waitTime2     = 5000; // 5s
 
 void setup()
 {
   //Ein - AUsgaenge definieren
   pinMode(CoverOpen, INPUT_PULLUP);
-  pinMode(KeyLock, INPUT_PULLUP);
   pinMode(garageButton, INPUT_PULLUP);
   pinMode(door, OUTPUT);
   pinMode(garage, OUTPUT);
@@ -137,13 +132,14 @@ void loop()                     // run over and over again
   delay(10);//kleine Zeitverz√∂gerung f√ºr Loop
   //Schalter einlesen
   CoverOpen_read = digitalRead(CoverOpen);
-  KeyLock_read = digitalRead(KeyLock);
   keypad.getKey();
 
   garageButton_read = digitalRead(garageButton);
         if (garageButton_read == LOW)
         {
           setgarageButton = 1;
+          Serial.println(F("Garagentaster selektiert!"));
+
           lastTime = millis();
         }
 
@@ -173,23 +169,17 @@ void loop()                     // run over and over again
     case 0:
       ID  = -1; //war 255
       ID2 = 0;
-      Serial.println(F("State 0"));
-      if (CoverOpen_read == LOW) {   // Schalterabdeckung offen Aktivierung Fingerprint f√ºr t√ºre
+    //  Serial.println(F("State 0"));
+      if (CoverOpen_read == HIGH) {   // Schalterabdeckung offen Aktivierung Fingerprint f√ºr t√ºre
         State = 1; //Finger scannen und auslesen
         lastTime2 =millis(); // Timer für Einlesen Fingerprint
-        lcd.backlight();
-        lcd.display();
-      }
-
-      else if (KeyLock_read == LOW) {
-        State = 3; // neuen Finger einlesen oder l√∂schen
         lcd.backlight();
         lcd.display();
       }
       break;
 
     case 1: //Finger scannen und auswerten
-      Serial.println(F("State 1"));
+    //  Serial.println(F("State 1"));
       lcd.clear();
       lcd.print("Finger Scanner!");
       if (elapsedTime2 >= waitTime2)
@@ -199,6 +189,7 @@ void loop()                     // run over and over again
          lcd.clear();
          lcd.print("Error!");
          delay(2000);
+         lastTime2 = millis();
          lcd.noDisplay();
          lcd.noBacklight();
         break;
@@ -227,7 +218,7 @@ void loop()                     // run over and over again
       break;
 
     case 2:    //T√ºren √∂ffnen
-      Serial.println(F("State 2"));
+    //  Serial.println(F("State 2"));
       digitalWrite(door, HIGH); // T√ºrrelais schliessen
       lcd.clear();
       lcd.print("Tuere oeffnen");
@@ -236,7 +227,7 @@ void loop()                     // run over and over again
       digitalWrite(door, LOW); // T√ºrrelais √∂ffnen
       delay(300);
       digitalWrite(door, HIGH); // T√ºrrelais schliessen
-      delay(1000);
+      delay(300);
       digitalWrite(door, LOW); // T√ºrrelais √∂ffnen
       State = 0; // Initalstatus
       delay(2000);
@@ -246,7 +237,7 @@ void loop()                     // run over and over again
       break;
 
     case 3:  // neuen Finger einlesen (*) oder l√∂schen (#)
-      Serial.println(F("State 3"));
+    //  Serial.println(F("State 3"));
       // neuen Einlesen eines Fingers
       Serial.println(F("* fuer speichern oder # fuer loeschen "));
       lcd.clear();
@@ -302,7 +293,7 @@ void loop()                     // run over and over again
       break;
 
     case 4: //Garagentor öffnen
-      Serial.println(F("State 4"));
+    //  Serial.println(F("State 4"));
       digitalWrite(garage, HIGH); // T√ºrrelais schliessen
       lcd.clear();
       lcd.print("Garage oeffnen");
